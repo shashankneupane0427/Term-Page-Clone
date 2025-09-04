@@ -31,31 +31,37 @@ fastify.get("/terms/:lang", async (req, reply) => {
   }
 });
 
-// Ensure DB + seed runs only once
+// Initialize DB and seed only once
 let initialized = false;
 async function init() {
   if (!initialized) {
     await sequelize.authenticate();
     console.log("Database connected");
-    await sequelize.sync({ force: true });
+
+    // Use `{ force: false }` in production to avoid dropping tables
+    await sequelize.sync({ force: process.env.NODE_ENV !== "production" });
     console.log("Database synced");
+
+    // Seed only if needed
     await seedDefaultTerms();
     console.log("Default terms seeded");
+
     initialized = true;
   }
 }
-await init();
 
-// 🔹 Run locally on port 4000 for testing
+// Local development
 if (process.env.NODE_ENV !== "production") {
+  await init();
   fastify.listen({ port: 4000 }, (err, address) => {
     if (err) throw err;
     console.log(`Server running locally at ${address}`);
   });
 }
 
-// 🔹 Export handler for Vercel serverless
-export default async (req, res) => {
+// Vercel serverless handler
+export default async function handler(req, res) {
+  if (!initialized) await init(); // Initialize DB once per cold start
   await fastify.ready();
   fastify.server.emit("request", req, res);
-};
+}
