@@ -7,10 +7,15 @@ import { seedDefaultTerms } from "./seed.js";
 
 dotenv.config();
 
-const fastify = Fastify({ logger: true });
+const fastify = Fastify({ logger: false });
 
 // Enable CORS
 await fastify.register(cors, { origin: "*" });
+
+// Root route
+fastify.get("/", async () => {
+  return { message: "Backend is running 🚀" };
+});
 
 // Route to get terms by language
 fastify.get("/terms/:lang", async (req, reply) => {
@@ -19,7 +24,6 @@ fastify.get("/terms/:lang", async (req, reply) => {
     const terms = await Terms.findOne({ where: { language: lang } });
     if (!terms) return reply.status(404).send({ error: "Not found" });
 
-    // Return only the JSON content
     return terms.content;
   } catch (err) {
     console.error("Error fetching terms:", err);
@@ -27,25 +31,31 @@ fastify.get("/terms/:lang", async (req, reply) => {
   }
 });
 
-
-// Start server and run seeder
-const startServer = async () => {
-  try {
+// Ensure DB + seed runs only once
+let initialized = false;
+async function init() {
+  if (!initialized) {
     await sequelize.authenticate();
     console.log("Database connected");
-
-    await sequelize.sync({ force: true }); // Drops and recreates tables
+    await sequelize.sync({ force: true });
     console.log("Database synced");
-
-    await seedDefaultTerms(); // seed default terms
+    await seedDefaultTerms();
     console.log("Default terms seeded");
-
-    await fastify.listen({ port: process.env.PORT || 4000 });
-    console.log(`Server running at http://localhost:${process.env.PORT || 4000}`);
-  } catch (err) {
-    console.error("Server failed to start:", err);
-    process.exit(1);
+    initialized = true;
   }
-};
+}
+await init();
 
-startServer();
+// 🔹 Run locally on port 4000 for testing
+if (process.env.NODE_ENV !== "production") {
+  fastify.listen({ port: 4000 }, (err, address) => {
+    if (err) throw err;
+    console.log(`Server running locally at ${address}`);
+  });
+}
+
+// 🔹 Export handler for Vercel serverless
+export default async (req, res) => {
+  await fastify.ready();
+  fastify.server.emit("request", req, res);
+};
