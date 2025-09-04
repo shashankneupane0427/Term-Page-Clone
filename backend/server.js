@@ -36,15 +36,15 @@ let initialized = false;
 async function init() {
   if (!initialized) {
     await sequelize.authenticate();
-    console.log("✅ Database connected");
+    console.log("Database connected");
 
     // Avoid dropping tables in production
     await sequelize.sync({ force: process.env.NODE_ENV !== "production" });
-    console.log("✅ Database synced");
+    console.log("Database synced");
 
     // Seed only if needed
     await seedDefaultTerms();
-    console.log("✅ Default terms seeded");
+    console.log("Default terms seeded");
 
     initialized = true;
   }
