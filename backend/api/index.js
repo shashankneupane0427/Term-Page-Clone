@@ -1,23 +1,20 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import dotenv from "dotenv";
-import sequelize from "./db.js";
-import Terms from "./models/Terms.js";
-import { seedDefaultTerms } from "./seed.js";
+import sequelize from "../db.js";
+import Terms from "../models/Terms.js";
+import { seedDefaultTerms } from "../seed.js";
 
 dotenv.config();
 
 const fastify = Fastify({ logger: false });
 
-// Enable CORS
 await fastify.register(cors, { origin: "*" });
 
-// Root route
 fastify.get("/", async () => {
   return { message: "Backend is running 🚀" };
 });
 
-// Route to get terms by language
 fastify.get("/terms/:lang", async (req, reply) => {
   try {
     const { lang } = req.params;
@@ -31,37 +28,18 @@ fastify.get("/terms/:lang", async (req, reply) => {
   }
 });
 
-// Initialize DB and seed only once
 let initialized = false;
 async function init() {
   if (!initialized) {
     await sequelize.authenticate();
-    console.log("Database connected");
-
-    // Use `{ force: false }` in production to avoid dropping tables
     await sequelize.sync({ force: process.env.NODE_ENV !== "production" });
-    console.log("Database synced");
-
-    // Seed only if needed
     await seedDefaultTerms();
-    console.log("Default terms seeded");
-
     initialized = true;
   }
 }
 
-// Local development
-if (process.env.NODE_ENV !== "production") {
-  await init();
-  fastify.listen({ port: 4000 }, (err, address) => {
-    if (err) throw err;
-    console.log(`Server running locally at ${address}`);
-  });
-}
-
-// Vercel serverless handler
 export default async function handler(req, res) {
-  if (!initialized) await init(); // Initialize DB once per cold start
+  if (!initialized) await init();
   await fastify.ready();
   fastify.server.emit("request", req, res);
 }
