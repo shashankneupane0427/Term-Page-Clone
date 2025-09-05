@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./navbar.css";
 
 const Navbar = ({ lang, setLang, navigation }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 1266);
+
+  const menuRef = useRef(null);
+  const hamburgerRef = useRef(null);
+  const langRef = useRef(null);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -25,8 +29,9 @@ const Navbar = ({ lang, setLang, navigation }) => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
-        !event.target.closest(".navigation-menu-bar") &&
-        !event.target.closest(".lang-dropk")
+        (menuRef.current && !menuRef.current.contains(event.target)) &&
+        (hamburgerRef.current && !hamburgerRef.current.contains(event.target)) &&
+        (langRef.current && !langRef.current.contains(event.target))
       ) {
         setIsMenuOpen(false);
         setIsLangOpen(false);
@@ -64,7 +69,8 @@ const Navbar = ({ lang, setLang, navigation }) => {
             </a>
           </div>
 
-          <div className="open-menu-dds" onClick={toggleMenu}>
+          {/* Hamburger */}
+          <div className="open-menu-dds" onClick={toggleMenu} ref={hamburgerRef}>
             <svg
               stroke="currentColor"
               fill="currentColor"
@@ -79,7 +85,7 @@ const Navbar = ({ lang, setLang, navigation }) => {
             </svg>
           </div>
 
-          <div className="navigation-menu-bar">
+          <div className="navigation-menu-bar" ref={menuRef}>
             {/* Mobile Menu */}
             <div
               className="menu-drop-down"
@@ -89,92 +95,47 @@ const Navbar = ({ lang, setLang, navigation }) => {
               }}
             >
               <div className="menu-drop-down-container">
-                <a className="menu-drop-down-item" href="/">
-                  <p className="menu-item-name">{nav.home}</p>
-                </a>
-                <a className="menu-drop-down-item" href="/">
-                  <p className="menu-item-name">{nav.order}</p>
-                </a>
-                <a className="menu-drop-down-item" href="/">
-                  <p className="menu-item-name">{nav.our_customer}</p>
-                </a>
-                <a className="menu-drop-down-item" href="/">
-                  <p className="menu-item-name">{nav.about_us}</p>
-                </a>
-                <a className="menu-drop-down-item" href="/">
-                  <p className="menu-item-name">{nav.contact_us}</p>
-                </a>
+                <a className="menu-drop-down-item" href="/"><p>{nav.home}</p></a>
+                <a className="menu-drop-down-item" href="/"><p>{nav.order}</p></a>
+                <a className="menu-drop-down-item" href="/"><p>{nav.our_customer}</p></a>
+                <a className="menu-drop-down-item" href="/"><p>{nav.about_us}</p></a>
+                <a className="menu-drop-down-item" href="/"><p>{nav.contact_us}</p></a>
               </div>
             </div>
 
             {/* PC Menu */}
             <div className="pc-menu">
-              <a className="pc-menu-items" href="/">
-                <p className="collectionitem">{nav.home}</p>
-              </a>
-              <a className="pc-menu-items" href="/">
-                <p className="collectionitem">{nav.order}</p>
-              </a>
-              <a className="pc-menu-items" href="/">
-                <p className="collectionitem">{nav.our_customer}</p>
-              </a>
-              <a className="pc-menu-items" href="/">
-                <p className="collectionitem">{nav.about_us}</p>
-              </a>
-              <a className="pc-menu-items" href="/">
-                <p className="collectionitem">{nav.contact_us}</p>
-              </a>
+              <a className="pc-menu-items" href="/"><p className="collectionitem">{nav.home}</p></a>
+              <a className="pc-menu-items" href="/"><p className="collectionitem">{nav.order}</p></a>
+              <a className="pc-menu-items" href="/"><p className="collectionitem">{nav.our_customer}</p></a>
+              <a className="pc-menu-items" href="/"><p className="collectionitem">{nav.about_us}</p></a>
+              <a className="pc-menu-items" href="/"><p className="collectionitem">{nav.contact_us}</p></a>
 
-              {/* PC Language Menu (only if desktop) */}
               {isDesktop && (
                 <a
                   className="pc-menu-items language-pc-menu-items"
                   href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    toggleLang();
-                  }}
+                  onClick={(e) => { e.preventDefault(); toggleLang(); }}
+                  ref={langRef}
                 >
                   <div className="language-box">
-                    <p className="flag-name collectionitem">
-                      {lang === "en" ? "English" : "Svenska"}
-                    </p>
+                    <p className="flag-name collectionitem">{lang === "en" ? "English" : "Svenska"}</p>
                     <img
-                      src={
-                        lang === "en"
-                          ? "https://storage.123fakturere.no/public/flags/GB.png"
-                          : "https://storage.123fakturere.no/public/flags/SE.png"
-                      }
+                      src={lang === "en"
+                        ? "https://storage.123fakturere.no/public/flags/GB.png"
+                        : "https://storage.123fakturere.no/public/flags/SE.png"}
                       className="icon-flag-nav"
                       alt={lang === "en" ? "English" : "Svenska"}
                     />
                   </div>
-
-                  <div
-                    className="dropdownList"
-                    style={{ display: isLangOpen ? "block" : "none" }}
-                  >
-                    <div
-                      className="language-Svenska drop-down-element"
-                      onClick={() => selectLanguage("sv")}
-                    >
+                  <div className="dropdownList" style={{ display: isLangOpen ? "block" : "none" }}>
+                    <div className="drop-down-element" onClick={() => selectLanguage("sv")}>
                       <div className="drop-down-lang-name">Svenska</div>
-                      <img
-                        src="https://storage.123fakturere.no/public/flags/SE.png"
-                        className="drop-down-image"
-                        alt="Svenska"
-                      />
+                      <img src="https://storage.123fakturere.no/public/flags/SE.png" className="drop-down-image" alt="Svenska"/>
                     </div>
-                    <div
-                      className="language-English drop-down-element"
-                      onClick={() => selectLanguage("en")}
-                    >
+                    <div className="drop-down-element" onClick={() => selectLanguage("en")}>
                       <div className="drop-down-lang-name">English</div>
-                      <img
-                        src="https://storage.123fakturere.no/public/flags/GB.png"
-                        className="drop-down-image"
-                        alt="English"
-                      />
+                      <img src="https://storage.123fakturere.no/public/flags/GB.png" className="drop-down-image" alt="English"/>
                     </div>
                   </div>
                 </a>
@@ -182,52 +143,30 @@ const Navbar = ({ lang, setLang, navigation }) => {
             </div>
           </div>
 
-          {/* Mobile Language Dropdown (only if not desktop) */}
+          {/* Mobile Language Dropdown */}
           {!isDesktop && (
-            <div className="lang-dropk">
+            <div className="lang-dropk" ref={langRef}>
               <div>
                 <div className="dropdownContainer" onClick={toggleLang}>
                   <div className="language-box">
-                    <p className="flag-name collectionitem">
-                      {lang === "en" ? "English" : "Svenska"}
-                    </p>
+                    <p className="flag-name collectionitem">{lang === "en" ? "English" : "Svenska"}</p>
                     <img
-                      src={
-                        lang === "en"
-                          ? "https://storage.123fakturere.no/public/flags/GB.png"
-                          : "https://storage.123fakturere.no/public/flags/SE.png"
-                      }
+                      src={lang === "en"
+                        ? "https://storage.123fakturere.no/public/flags/GB.png"
+                        : "https://storage.123fakturere.no/public/flags/SE.png"}
                       className="icon-flag-nav"
                       alt={lang === "en" ? "English" : "Svenska"}
                     />
                   </div>
                 </div>
-
-                <div
-                  className="dropdownList"
-                  style={{ display: isLangOpen ? "block" : "none" }}
-                >
-                  <div
-                    className="language-Svenska drop-down-element"
-                    onClick={() => selectLanguage("sv")}
-                  >
+                <div className="dropdownList" style={{ display: isLangOpen ? "block" : "none" }}>
+                  <div className="drop-down-element" onClick={() => selectLanguage("sv")}>
                     <div className="drop-down-lang-name">Svenska</div>
-                    <img
-                      src="https://storage.123fakturere.no/public/flags/SE.png"
-                      className="drop-down-image"
-                      alt="Svenska"
-                    />
+                    <img src="https://storage.123fakturere.no/public/flags/SE.png" className="drop-down-image" alt="Svenska"/>
                   </div>
-                  <div
-                    className="language-English drop-down-element"
-                    onClick={() => selectLanguage("en")}
-                  >
+                  <div className="drop-down-element" onClick={() => selectLanguage("en")}>
                     <div className="drop-down-lang-name">English</div>
-                    <img
-                      src="https://storage.123fakturere.no/public/flags/GB.png"
-                      className="drop-down-image"
-                      alt="English"
-                    />
+                    <img src="https://storage.123fakturere.no/public/flags/GB.png" className="drop-down-image" alt="English"/>
                   </div>
                 </div>
               </div>
