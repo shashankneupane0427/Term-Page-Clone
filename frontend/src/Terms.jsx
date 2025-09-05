@@ -20,13 +20,19 @@ export default function Terms() {
 
   // Close button handler
   const handleGoBack = () => {
-    if (document.referrer) {
-      // Go back if the user has a previous page
-      window.history.back();
-    } else {
-      // Fallback to homepage
-      window.location.href = "/";
-    }
+    // Try to close the tab (works only if opened via window.open)
+    window.close();
+
+    // Fallback if window.close() didn’t work
+    setTimeout(() => {
+      if (!window.closed) {
+        if (document.referrer) {
+          window.history.back();
+        } else {
+          window.location.href = "/";
+        }
+      }
+    }, 300);
   };
 
   return (
@@ -73,7 +79,10 @@ export default function Terms() {
                 </div>
 
                 <div className="terms-top-text">
-                  <button className="go-back-button lower-back-button" onClick={handleGoBack}>
+                  <button
+                    className="go-back-button lower-back-button"
+                    onClick={handleGoBack}
+                  >
                     {termsData?.terms?.close || "Close and Go Back"}
                   </button>
                 </div>
