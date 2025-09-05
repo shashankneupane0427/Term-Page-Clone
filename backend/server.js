@@ -14,7 +14,7 @@ await fastify.register(cors, { origin: "*" });
 
 // Root route
 fastify.get("/", async () => {
-  return { message: "Backend is running 🚀" };
+  return { message: "Backend is running " };
 });
 
 // Route to get terms by language
@@ -57,5 +57,5 @@ const PORT = process.env.PORT || 4000;
 await init();
 fastify.listen({ port: PORT, host: "0.0.0.0" }, (err, address) => {
   if (err) throw err;
-  console.log(`🚀 Server running at ${address}`);
+  console.log(`Server running at ${address}`);
 });
