@@ -5,7 +5,7 @@ The project supports multiple languages and dynamically fetches content from the
 
 ---
 
-## 🗂 Project Structure
+##  Project Structure
 
 ```
 TERM-PAGE-CLONE
@@ -64,7 +64,6 @@ npm install
 VITE_API_URL=http://localhost:4000
 ```
 
-> Replace with your backend URL if different.
 
 4. **Start the development server:**
 
@@ -101,7 +100,6 @@ DATABASE_URL=<your-database-url>
 NODE_ENV=development
 ```
 
-> **Note:** Do not share your database URL publicly.
 
 4. **Start the development server:**
 
@@ -133,5 +131,3 @@ Due to **free Render account limitations**, the backend or database may take lon
 Free instances spin down with inactivity, which can delay requests by **50 seconds or more**.
 
 ---
-
-This README is ready to copy-paste into your **Word**, **VS Code**, or **GitHub repository** as professional project documentation.
